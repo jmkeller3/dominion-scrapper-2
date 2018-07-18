@@ -29,13 +29,13 @@ const baseURL = 'http://dominion.diehrstraits.com/';
         const cards = $('.card-row');
 
         for (const card of cards.toArray()) {
-            const number = $(card).find('card-number').text();
-            const name = $(card).find('card-name').text();
+            const number = $(card).find('.card-number').text();
+            const name = $(card).find('.card-name').text();
             //console.log(name);
-            const expansion = $(card).find('card-expansion').text();
-            const type = $(card).find('card-type').text();
-            const cost = $(card).find('card-cost').text();
-            const rules = $(card).find('card-rules').text();
+            const expansion = $(card).find('.card-expansion').text();
+            const type = $(card).find('.card-type').text();
+            const cost = $(card).find('.card-cost').text();
+            const rules = $(card).find('.card-rules').text();
 
             //pictures
             // const cardPictureRelativeLink = $(card).find('.card-link>.card-img').attr('src');
@@ -65,7 +65,7 @@ const baseURL = 'http://dominion.diehrstraits.com/';
     const filePath = 'dominion-cards.json';
 
 
-    fs.writeFile(filePath, fileContent, (err) => {
+    fs.writeFile(filePath, JSON.stringify(fileContent), (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
     } )
