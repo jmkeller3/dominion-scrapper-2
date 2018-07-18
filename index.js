@@ -21,8 +21,23 @@ const jsonPayload = {
 
 const baseURL = 'http://dominion.diehrstraits.com/';
 
+
 (async function execute() {
     const sets = Object.keys(jsonPayload);
+    for (const set of sets) {
+        const htmlString = await fetch(`${baseURL}?set=${set}`).then((res) => res.text());
+        const $ = cheerio.load(htmlString);
+        const cards = $('.card-container');
+
+        for (const card of cards.toArray()) {
+            const cardPictureRelativeLink = $(card).find('.card-link>.card-img').attr('src');
+            const cardPictureAbsoluteLink = `${baseURL}${cardPictureRelativeLink}`;
+            const pictureResponse = await fetch(cardPictureAbsoluteLink);
+            const dest = fs.createWriteStream(cardPictureRelativeLink);
+            pictureResponse.body.pipe(dest);
+        };
+    }
+    
     for (const set of sets) {
         const htmlString = await fetch(`${baseURL}?set=${set}&f=list`).then((res) => res.text());
         const $ = cheerio.load(htmlString);
@@ -36,13 +51,8 @@ const baseURL = 'http://dominion.diehrstraits.com/';
             const type = $(card).find('.card-type').text();
             const cost = $(card).find('.card-cost').text();
             const rules = $(card).find('.card-rules').text();
-
-            //pictures
-            // const cardPictureRelativeLink = $(card).find('.card-link>.card-img').attr('src');
-            // const cardPictureAbsoluteLink = `${baseURL}${cardPictureRelativeLink}`;
-            // const pictureResponse = await fetch(cardPictureAbsoluteLink);
-            // const dest = fs.createWriteStream(cardPictureRelativeLink);
-            // pictureResponse.body.pipe(dest);
+            const pic = `${baseURL}scans/${expansion}/${name}.jpg`;
+            const picture = pic.toLowerCase();
 
             jsonPayload[set] = [...jsonPayload[set], {
                 number: number,
@@ -51,21 +61,21 @@ const baseURL = 'http://dominion.diehrstraits.com/';
                 type: type,
                 cost: cost,
                 rules: rules,
-                //picture: cardPictureRelativeLink
+                picture: picture
             }];
-            // console.log(jsonPayload[set].name)
+            console.log(jsonPayload[set].picture)
         }
     }
 
     console.log(jsonPayload);
-    console.log(jsonPayload.Base[0])
+    console.log(jsonPayload.Base[0]);
     
     const fileContent = jsonPayload;
 
     const filePath = 'dominion-cards.json';
 
 
-    fs.writeFile(filePath, JSON.stringify(fileContent), (err) => {
+    fs.writeFile(filePath, JSON.stringify(fileContent, null, 4), (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
     } )
