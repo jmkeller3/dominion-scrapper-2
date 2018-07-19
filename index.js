@@ -63,7 +63,6 @@ const baseURL = 'http://dominion.diehrstraits.com/';
                 rules: rules,
                 picture: picture
             }];
-            console.log(jsonPayload[set].picture)
         }
     }
 
